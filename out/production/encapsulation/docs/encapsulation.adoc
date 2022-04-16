@@ -1,0 +1,228 @@
+= 封裝（Encapsulation）
+
+主要目的：*隱藏物件的細節*，將物件當作黑箱進行操作。
+
+== 好處
+
+* 隱藏細節，降低複雜度，提高開發效率。
+
+* 類別成員在存取時可在內部進行檢查、篩選、過濾等，增加了資料安全。
+
+* 提高程式的健壯性(robustness)。
+
+[NOTE]
+====
+類別成員及方法被修改時只要對外規格不變（名稱及引數型態不變），就不會影響到客戶端的使用，達到程式間隔離的效果，。
+====
+
+== 定義類別（Class）
+
+Java 中使用 "class" 關鍵字來定義類別，使用類別來定義一個物件（Object）時，會考慮這個物件可能擁有的「屬性」（Property）與「方法」（Method）。
+
+* 「屬性」是物件的靜態表現。
+* 「方法」是物件與外界互動的動態操作。
+
+[NOTE]
+====
+存取物件的資料成員：透過「.」運算子
+
+Example:
+
+    String str = "hElLo Covid19";
+    System.out.println(str.toLowerCase());
+====
+
+== 修飾子（modifiers）
+
+來複習一下唄
+
+|===
+|存取修飾子 |同一Class |同一Package |子類別 |不同的Package
+
+|private 私有的
+|Yes
+|-
+|-
+|-
+
+|default 預設的
+|Yes
+|Yes
+|-
+|-
+
+|protected 半公開
+|Yes
+|Yes
+|(Yes)要繼承
+|-
+
+|public 公開的
+|Yes
+|Yes
+|Yes
+|Yes
+|===
+
+
+== 建構子（Constructor）
+
+* 與類別名稱同名的方法（Method），不用宣告傳回型態。
+* 它實現物件初始化流程的封裝。
+
+.People.java
+[source,java]
+----
+public class People {
+    private String name;
+    private int age;
+    private boolean attend = false;
+
+    // 都沒寫的時候編譯器會自動幫你加入一個Default constructor
+    public People() {
+
+    }
+}
+----
+
+[NOTE]
+====
+如果定義類別時，沒有自行定義，編譯器會自動加入一個無參數、內容為空的建構子。
+====
+
+.呼叫建構子來建立物件
+----
+People people = new People();
+----
+
+== 封裝物件內部資料
+
+不想讓使用者直接存取私有資料，必須透過提供的操作方法（如： `getter`、`setter`）。
+
+.People.java
+[source,java]
+----
+public class People {
+    private String name;
+    private int age;
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+}
+----
+
+== 多載（Overloading）
+
+方法名相同，呼叫時依照給予的參數決定使用哪一個方法。
+
+.People.java
+[source,java]
+----
+public int getAge() {
+    return age;
+}
+
+// 帶參數的代表較年輕
+public int getAge(int number) {
+    return this.age -= number;
+}
+----
+
+== 方法封裝
+
+封裝了物件的操作流程。
+
+.People.java
+[source,java]
+----
+public float getHitRate() {
+return countHitRate();
+}
+
+private float countHitRate() {
+    return ((20000f + 100f) / 100000f) * 100f;
+}
+----
+
+== this
+
+代表「這個物件」的參考名稱，常見於建構子參數與物件資料成員同名時。
+.People.java
+[source,java]
+----
+public class People {
+    private String name;
+    private int age;
+    private boolean attend = false;
+
+    public People(String name, int age, boolean attend) {
+        this.name = name;
+        this.age = age;
+        this.attend = attend;
+    }
+}
+----
+
+
+.People.java
+[source,java]
+----
+public class People {
+    public People() {
+    }
+
+    public People(String name, int age, boolean attend) {
+        this(); // 指的是預設建構子，流程是重複的，建議別這樣寫
+    }
+}
+----
+
+== static 類別成員
+
+常用於 Util
+
+* static 方法中不能用非 static 資料成員。
+* static 方法中不能用非 static 方法。
+
+.Vaccination.java
+[source,java]
+----
+public class Vaccination {
+int dose = 100;
+
+    public static void doHit() {
+//        System.out.println("劑量為：" + dose + "cc"); // static 方法中不能用非 static 資料成員
+//        callNurse(); // static 方法中不能用非 static 方法
+        System.out.println("施打疫苗中...");
+    }
+
+    public void callNurse() {
+        System.out.println("OOO請就位。");
+    }
+}
+----
+
+== 不定長度引數（Variable-length Argument）
+
+* JDK5 後支援
+* 實際展開為 *陣列*
+* 必須宣告於參數列最後一個
+* 同一方法不能宣告超過兩個
+
+.Vaccination.java
+[source,java]
+----
+public static void sumDose(int... numbers) {
+    int sum = 0;
+    // new int[] {x, y, z...};
+    for (int number : numbers) {
+        sum += number;
+    }
+    System.out.println("殘劑剩餘：" + sum + "cc");
+}
+----
